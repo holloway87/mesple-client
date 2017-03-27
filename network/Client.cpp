@@ -33,10 +33,10 @@ string Client::getServerAddress() {
     for(info = serverInfo; NULL != info; info = info->ai_next) {
         void *address;
 
-        if (info->ai_family == AF_INET) { // IPv4
+        if (AF_INET == info->ai_family) {
             struct sockaddr_in *ipv4 = (struct sockaddr_in *) info->ai_addr;
             address = &(ipv4->sin_addr);
-        } else { // IPv6
+        } else {
             struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *) info->ai_addr;
             address = &(ipv6->sin6_addr);
         }
