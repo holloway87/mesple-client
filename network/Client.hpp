@@ -24,6 +24,7 @@ public:
     Client(const string host, const string port);
     void init();
     void shutdown();
+    string getServerAddress();
 };
 
 

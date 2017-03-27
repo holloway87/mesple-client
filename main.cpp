@@ -27,6 +27,8 @@ int main(int argc, char *argv[]) {
         return e.code;
     }
 
+    cout << "server address: " <<  client.getServerAddress() << endl;
+
     client.shutdown();
 
     return 0;

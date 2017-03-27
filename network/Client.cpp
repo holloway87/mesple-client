@@ -4,6 +4,7 @@
  */
 
 #include <cstring>
+#include <arpa/inet.h>
 
 #include "Client.hpp"
 #include "ClientException.hpp"
@@ -17,6 +18,38 @@
 Client::Client(const string host, const string port) {
     serverHost = host;
     serverPort = port;
+}
+
+/**
+ * Return all IPs in string representation.
+ *
+ * @return all ips separated by comma
+ */
+string Client::getServerAddress() {
+    struct addrinfo *info;
+    char ipString[INET6_ADDRSTRLEN];
+    string result;
+
+    for(info = serverInfo; NULL != info; info = info->ai_next) {
+        void *address;
+
+        if (info->ai_family == AF_INET) { // IPv4
+            struct sockaddr_in *ipv4 = (struct sockaddr_in *) info->ai_addr;
+            address = &(ipv4->sin_addr);
+        } else { // IPv6
+            struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *) info->ai_addr;
+            address = &(ipv6->sin6_addr);
+        }
+
+        inet_ntop(info->ai_family, address, ipString, sizeof ipString);
+
+        result += ipString;
+        if (NULL != info->ai_next) {
+            result += ", ";
+        }
+    }
+
+    return result;
 }
 
 /**
