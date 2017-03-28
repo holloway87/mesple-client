@@ -14,6 +14,8 @@ using namespace std;
 class ClientException {
 public:
     const static short CODE_NO_SERVER_ADDRESS_INFO = 10;
+    const static short CODE_SOCKET_ERROR = 11;
+    const static short CODE_CONNECT_ERROR = 12;
 
     short code;
     string message;

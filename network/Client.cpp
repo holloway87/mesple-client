@@ -5,6 +5,7 @@
 
 #include <cstring>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 #include "Client.hpp"
 #include "ClientException.hpp"
@@ -18,6 +19,43 @@
 Client::Client(const string host, const string port) {
     serverHost = host;
     serverPort = port;
+}
+
+/**
+ * Establish connection to the server.
+ *
+ * @since 2017.03.29
+ */
+void Client::connectToServer() {
+    int status;
+    struct addrinfo *info;
+
+    for (info = serverInfo; NULL != info; info = info->ai_next) {
+        serverSocket = socket(info->ai_family, info->ai_socktype, info->ai_protocol);
+
+        if (-1 == serverSocket) {
+            continue;
+        }
+
+        status = connect(serverSocket, info->ai_addr, info->ai_addrlen);
+        if (-1 == status) {
+            continue;
+        }
+
+        break;
+    }
+
+    if (NULL == info) {
+        if (-1 == serverSocket) {
+            string message = "could not create socket: ";
+            message += strerror(errno);
+
+            throw ClientException(message, ClientException::CODE_SOCKET_ERROR);
+        } else {
+            throw ClientException("could not connect to host " + serverHost + ":" + serverPort + ": " + strerror(errno),
+                                  ClientException::CODE_CONNECT_ERROR);
+        }
+    }
 }
 
 /**
@@ -57,6 +95,7 @@ string Client::getServerAddress() {
  */
 void Client::init() {
     setServerInfo();
+    connectToServer();
 }
 
 /**
@@ -84,4 +123,7 @@ void Client::setServerInfo() {
  */
 void Client::shutdown() {
     freeaddrinfo(serverInfo);
+    if (0 <= serverSocket) {
+        close(serverSocket);
+    }
 }

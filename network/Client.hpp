@@ -14,10 +14,12 @@ using namespace std;
 
 class Client {
 private:
+    string serverHost;
     struct addrinfo *serverInfo;
     string serverPort;
-    string serverHost;
+    int serverSocket;
 
+    void connectToServer();
     void setServerInfo();
 
 public:
